@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Fornecedor: {{ provider.name }}</h1>
+    <hr>
+    {% for t in provider.transactions %}
+    <p>
+    {{ t.timestamp }} : <b>{{ t.products }}</b>
+    </p>
+    {% endfor %}
+{% endblock %}

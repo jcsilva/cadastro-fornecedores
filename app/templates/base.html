@@ -1,0 +1,27 @@
+<html>
+    <head>
+      {% if title %}
+      <title>{{ title }}</title>
+      {% else %}
+      <title>Cadastro de Fornecedores</title>
+      {% endif %}
+    </head>
+    <body>
+        <div>
+            <a href="{{ url_for('index') }}">Listar Fornecedores</a>
+            <a href="{{ url_for('new_provider') }}">Novo Fornecedor</a>
+            <a href="{{ url_for('new_transaction') }}">Cadastrar Compra</a>
+        </div>
+        <hr>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </body>
+</html>

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>{{ title }}</h2>
+
+<table>
+    <tr>
+        {% for row_title in the_row_titles %}
+            <th>{{row_title}}</th>
+        {% endfor %}
+    </tr>
+    {% for provider in the_data %}
+        <tr>
+            <td>{{provider.name}}</td>
+            <td>{{provider.address}}</td>
+            <td>{{provider.contact}}</td>
+            <td><a href="{{ url_for('provider', providername=provider.name) }}">Visualizar transações</a></td>
+        </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
