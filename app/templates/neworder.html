@@ -5,15 +5,15 @@
     <form action="" method="post">
         {{ form.hidden_tag() }}
         <p>
-            {{ form.company }}<br>
-            {% for error in form.company.errors %}
+            {{ form.supplier.label }}<br>
+            {% for error in form.supplier.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
         <p>
-            {{ form.products.label }}<br>
-            {{ form.products }}<br>
-            {% for error in form.products.errors %}
+            {{ form.items.label }}<br>
+            {{ form.items }}<br>
+            {% for error in form.items.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>

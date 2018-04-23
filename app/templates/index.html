@@ -10,12 +10,12 @@
             <th>{{row_title}}</th>
         {% endfor %}
     </tr>
-    {% for provider in the_data %}
+    {% for supplier in the_data %}
         <tr>
-            <td>{{provider.name}}</td>
-            <td>{{provider.address}}</td>
-            <td>{{provider.contact}}</td>
-            <td><a href="{{ url_for('provider', providername=provider.name) }}">Visualizar transações</a></td>
+            <td>{{supplier.name}}</td>
+            <td>{{supplier.address}}</td>
+            <td>{{supplier.contact}}</td>
+            <td><a href="{{ url_for('supplier', suppliername=supplier.name) }}">Visualizar transações</a></td>
         </tr>
     {% endfor %}
 </table>

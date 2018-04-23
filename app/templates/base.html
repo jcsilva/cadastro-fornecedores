@@ -9,8 +9,10 @@
     <body>
         <div>
             <a href="{{ url_for('index') }}">Listar Fornecedores</a>
-            <a href="{{ url_for('new_provider') }}">Novo Fornecedor</a>
-            <a href="{{ url_for('new_transaction') }}">Cadastrar Compra</a>
+            <a href="{{ url_for('new_supplier') }}">Novo Fornecedor</a>
+            <a href="{{ url_for('new_order') }}">Cadastrar Compra</a>
+            <a href="{{ url_for('new_item') }}">Cadastrar Produto</a>
+            <a href="{{ url_for('list_items') }}">Listar Produtos</a>
         </div>
         <hr>
         {% with messages = get_flashed_messages() %}

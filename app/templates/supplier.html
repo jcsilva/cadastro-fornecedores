@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Fornecedor: {{ provider.name }}</h1>
+    <h1>Fornecedor: {{ supplier.name }}</h1>
     <hr>
-    {% for t in provider.transactions %}
+    {% for t in supplier.transactions %}
     <p>
     {{ t.timestamp }} : <b>{{ t.products }}</b>
     </p>

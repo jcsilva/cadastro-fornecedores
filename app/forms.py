@@ -4,16 +4,21 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from app.models import Provider
+from app.models import Supplier
 
 
-class ProviderForm(FlaskForm):
+class SupplierForm(FlaskForm):
     name = StringField('Nome', validators=[DataRequired()])
     address = StringField('Endereço')
     submit = SubmitField('Cadastrar')
     
 
-class TransactionForm(FlaskForm):
-    company = QuerySelectField(query_factory=lambda: Provider.query.all())
-    products = StringField('Produtos')
+class OrderForm(FlaskForm):
+    supplier = QuerySelectField(get_label='name', query_factory=lambda: Supplier.query.all())
+    items = StringField('Produtos')
+    submit = SubmitField('Cadastrar')
+
+
+class ItemForm(FlaskForm):
+    name = StringField('Produto', validators=[DataRequired()])
     submit = SubmitField('Cadastrar')
