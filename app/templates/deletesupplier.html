@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <form action="" method="post">
+    <fieldset>
+      <legend>Remover o fornecedor "{{ supplier.name }}" ?</legend>
+      <button class="btn btn-danger" type="submit">Deletar</button>
+      <a class="btn" href="{{ url_for('index') }}">Cancelar</a>
+    </fieldset>
+  </form>
+
+{% endblock %}

@@ -1,23 +1,14 @@
 {% extends "base.html" %}
+{% from "macros/form_field.html" import form_field %}
 
 {% block content %}
     <h1>Cadastrar</h1>
     <form action="" method="post">
         {{ form.hidden_tag() }}
-        <p>
-            {{ form.name.label }}<br>
-            {{ form.name(size=32) }}<br>
-            {% for error in form.name.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.address.label }}<br>
-            {{ form.address(size=32) }}<br>
-            {% for error in form.address.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>{{ form.submit() }}</p>
+        
+        {% for field in form %}
+          {{ form_field(field) }}
+        {% endfor %}
+    
     </form>
 {% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% from "macros/form_field.html" import form_field %}
+
+{% block content %}
+  <h1>Editar</h1>
+  <form action="" method="post">
+
+    {% for field in form %}
+      {{ form_field(field) }}
+    {% endfor %}
+
+    <div class="form-group">
+      <div class="col-sm-offset-3 col-sm-9">
+        <a class="btn" href="{{ url_for('index') }}">Cancelar</a>
+      </div>
+    </div>
+
+  </form>
+
+{% endblock %}

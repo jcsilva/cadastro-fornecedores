@@ -8,14 +8,20 @@ stock = db.Table('stock',
 )
 
 
+class Status():
+    ACTIVE = 0
+    DELETED = 1
+
+
 class Supplier(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    address = db.Column(db.String(256), index=True, unique=True)
+    address = db.Column(db.String(256), index=True)
+    status = db.Column(db.Integer, index=True)
     contacts = db.Column(db.String(256))
     portfolio = db.relationship('Item', secondary=stock, lazy='subquery',
                                 backref=db.backref('suppliers', lazy=True))
-    orders = db.relationship('Order', backref='supplier', lazy='dynamic')
+    orders = db.relationship('Order', backref='supplier', lazy='dynamic')    
     def __repr__(self):
         return '<Supplier {}>'.format(self.name)
 

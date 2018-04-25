@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Fornecedor: {{ supplier.name }}</h1>
+    <h1>Endereço: {{ supplier.address }}</h1>
+    <h1>Contatos: {{ supplier.contacts }}</h1>
+    <h1>Portfolio: {{ supplier.portfolio }}</h1>
+    <hr>
+    {% for t in supplier.orders %}
+    <p>
+    {{ t.timestamp }} : <b>{{ t.items }}</b>
+    </p>
+    {% endfor %}
+{% endblock %}
