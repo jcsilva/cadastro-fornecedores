@@ -1,12 +1,41 @@
-{% extends "base.html" %}
-{% import 'bootstrap/wtf.html' as wtf %}
+{% extends "base.html" %} {% block app_content %}
+<h1>Cadastrar Compra</h1>
 
-{% block app_content %}
-    <h1>Cadastrar</h1>
-    
-    <div class="row">
-      <div class="col-md-4">
-          {{ wtf.quick_form(form) }}
-      </div>
-    </div>
+<h2>Fornecedor: {{ supplier.name }} </h2>
+
+<hr>
+
+<div>
+    <form action="" method="post" name="teamform">
+      {# http://flask.pocoo.org/snippets/3/ #}
+      {{ form.hidden_tag() }}
+        <div>
+            <table>
+                <tr>
+                    <th> Nome </th>
+                    <th> Quantidade </th>
+                    <th> Preço unitário </th>
+                </tr>
+                {% for member in form.order_items %}
+                <tr>
+                    <td>{{ member.item }}</td>
+                    <td>{{ member.quantity }}</td>
+                    <td>{{ member.unit_price }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <br>
+        <p> {{ form.freight_company.label }}: {{ form.freight_company(size=32) }} </p>
+        <br>
+        <p> {{ form.freight_value.label }}: {{ form.freight_value(size=32) }} </p>
+
+        <p><input type="submit" name="edit" value="Cadastrar"></p>
+    </form>
+</div>
+
+{% if form.errors %}
+    {{ form.errors }}
+{% endif %}
+
 {% endblock %}

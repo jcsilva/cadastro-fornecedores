@@ -4,22 +4,25 @@
 
 <h2>{{ title }}</h2>
 
-<table>
+<table class="table table-hover">
     <tr>
-        {% for row_title in the_row_titles %}
-            <th>{{row_title}}</th>
-        {% endfor %}
+        <th>Nome</th>
+        <th>Endereço</th>
+        <th>Contato</th>
+        <th>Produtos</th>
     </tr>
     {% for supplier in the_data %}
         <tr>
             <td>{{supplier.name}}</td>
             <td>{{supplier.address}}</td>
-            <td>{{supplier.contact}}</td>
+            <td>{{supplier.contacts}}</td>
+            <td>{{supplier.portfolio}}</td>
             <td><a href="{{ url_for('detail_supplier', suppliername=supplier.name) }}">Visualizar Detalhes</a></td>
             <td><a href="{{ url_for('edit_supplier', suppliername=supplier.name) }}">Editar Fornecedor</a></td>
             <td><a href="{{ url_for('delete_supplier', suppliername=supplier.name) }}">Deletar Fornecedor</a></td>
         </tr>
     {% endfor %}
 </table>
+
 
 {% endblock %}

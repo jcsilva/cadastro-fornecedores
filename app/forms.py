@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SubmitField, SelectField
-from wtforms.validators import DataRequired
+from wtforms import StringField, TextAreaField, SubmitField, SelectField, DecimalField
+from wtforms.fields import FieldList, FormField
+from wtforms.validators import DataRequired, Optional
 from app.models import Item
-
-
-class OrderForm(FlaskForm):
-    supplier = SelectField('Fornecedor', coerce=int)
-    items = StringField('Produtos')
-    submit = SubmitField('Cadastrar')
+from wtforms import Form as NoCsrfForm
 
 
 class ItemForm(FlaskForm):
@@ -49,4 +45,22 @@ class SupplierForm(FlaskForm):
     address = TextAreaField('Endereço')
     contacts = TextAreaField('Contatos')
     portfolio = ItemField('Produtos', description='Listar produtos separados por vírgula.')
+    submit = SubmitField('Cadastrar')
+
+
+class PreOrderForm(FlaskForm):
+    supplier = SelectField('Fornecedor', coerce=int)
+    submit = SubmitField('Escolher')
+
+
+class OrderItemForm(NoCsrfForm):
+    item = StringField('Produto')
+    quantity = DecimalField('Valor do frete', validators=[Optional()])
+    unit_price = DecimalField('Valor do frete', validators=[Optional()])
+
+
+class OrderForm(FlaskForm):
+    order_items = FieldList(FormField(OrderItemForm))
+    freight_company = StringField('Nome da transportadora')
+    freight_value = DecimalField('Valor do frete', validators=[Optional()])
     submit = SubmitField('Cadastrar')

@@ -2,9 +2,9 @@
 
 {% block app_content %}
     <h1>Fornecedor: {{ supplier.name }}</h1>
-    <h1>Endereço: {{ supplier.address }}</h1>
-    <h1>Contatos: {{ supplier.contacts }}</h1>
-    <h1>Portfolio: {{ supplier.portfolio }}</h1>
+    <h2>Endereço: {{ supplier.address }}</h2>
+    <h2>Contatos: {{ supplier.contacts }}</h2>
+    <h2>Portfolio: {{ supplier.portfolio }}</h2>
     <hr>
     {% for t in supplier.orders %}
     <p>

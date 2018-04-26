@@ -1,22 +1,14 @@
 from app import app
 from app import db
 from flask import render_template, flash, redirect, request, url_for
-from app.forms import SupplierForm, OrderForm, ItemForm
-from app.models import Supplier, Order, Item, Status
+from app.forms import SupplierForm, OrderForm, ItemForm, PreOrderForm, OrderItemForm
+from app.models import Supplier, Order, Item, Status, OrderItem
 
 @app.route('/')
 @app.route('/index')
 def index():
-    row_titles = ['Nome', 'Endereço']
-    suppliers = Supplier.query.all()
-    data = []
-    for p in suppliers:
-        if p.status != Status.DELETED:
-            p_dict = {}
-            p_dict['name'] = p.name
-            p_dict['address'] = p.address
-            data.append(p_dict)
-    return render_template('index.html', title='Fornecedores', the_row_titles=row_titles, the_data=data)
+    suppliers = Supplier.query.filter(Supplier.status != Status.DELETED).order_by('name')
+    return render_template('index.html', title='Fornecedores', the_data=suppliers)
 
 
 @app.route('/newitem', methods=['GET', 'POST'])
@@ -45,17 +37,20 @@ def new_supplier():
     form = SupplierForm()
     if form.validate_on_submit():
         supplier = Supplier.query.filter_by(name=form.name.data).first()
-        # if I try to add a new supplier, but it was deleted (status = DELETED),
+        # if I try to add a new supplier, but it was deleted (status==DELETED),
         # I should update its variables instead of creating a new record
         if supplier:
+            # we never update name!
             supplier.contacts = form.contacts.data
-            supplier.address = form.contacts.data
+            supplier.address = form.address.data
             supplier.portfolio = form.portfolio.data
             supplier.status = Status.ACTIVE
         else:
-            p = Supplier(name=form.name.data, address=form.address.data,
-                     contacts=form.contacts.data,portfolio=form.portfolio.data,
-                     status=Status.ACTIVE)
+            p = Supplier(name=form.name.data,
+                         address=form.address.data,
+                         contacts=form.contacts.data,
+                         portfolio=form.portfolio.data,
+                         status=Status.ACTIVE)
             db.session.add(p)
         db.session.commit()
         flash('Novo fornecedor cadastrado {}, endereço={}, contato={}, produtos={}'.format(
@@ -71,7 +66,7 @@ def edit_supplier(suppliername):
         form = SupplierForm(obj=supplier)
         if form.validate_on_submit():
             supplier.contacts = form.contacts.data
-            supplier.address = form.contacts.data
+            supplier.address = form.address.data
             supplier.portfolio = form.portfolio.data
             db.session.commit()
             return redirect(url_for('detail_supplier', suppliername=supplier.name))
@@ -96,16 +91,34 @@ def detail_supplier(suppliername):
     return render_template('detailsupplier.html', title='Detalhes', supplier=supplier)
 
 
-@app.route('/neworder', methods=['GET', 'POST'])
-def new_order():
-    form = OrderForm()
+@app.route('/preorder/', methods=['GET', 'POST'])
+def pre_order():
+    form = PreOrderForm()
+    # TODO: o filtro de ACTIVE deveria estar dentro da classe Supplier?
     form.supplier.choices = [(g.id, g.name) for g in Supplier.query.filter(Supplier.status == Status.ACTIVE).order_by('name')]
+    if request.method == 'POST':
+        supplier = Supplier.query.filter_by(name=dict(form.supplier.choices).get(form.supplier.data)).first()
+        return redirect(url_for('new_order', suppliername=supplier.name))
+    return render_template('choosesupplier.html', form=form)
+
+
+@app.route('/neworder/<suppliername>', methods=['GET', 'POST'])
+def new_order(suppliername):
+    supplier = Supplier.query.filter_by(name=suppliername).first_or_404()
+    form = OrderForm()
     if form.validate_on_submit():
-        supplier = Supplier.query.filter_by(name=form.supplier.data).first_or_404()
-        t = Order(supllier_id=supplier.id)
-        db.session.add(t)
+        print(form.order_items.data)
+        order = Order(supplier_id=supplier.id,
+                      freight_company=form.freight_company.data,
+                      freight_value=form.freight_value.data,
+                      order_items=form.order_items.data)
+        db.session.add(order)
         db.session.commit()
-        flash('Nova transação cadastrada! Empresa={}, produtos={}'.format(
-            form.supplier.data, form.items.data))
-        return redirect(url_for('index'))
-    return render_template('neworder.html', form=form)
+        return redirect(url_for('detail_supplier', suppliername=supplier.name))
+    for item in supplier.portfolio:
+        order_item_form = OrderItemForm()
+        order_item_form.item = item.name
+        order_item_form.quantity = 0
+        order_item_form.unit_price = 0
+        form.order_items.append_entry(order_item_form)
+    return render_template('neworder.html', form=form, supplier=supplier)
