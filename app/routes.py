@@ -100,12 +100,12 @@ def detail_supplier(suppliername):
 def new_order():
     form = OrderForm()
     if form.validate_on_submit():
-        supplier = Supplier.query.filter_by(name=form.supplier_name.data).first_or_404()
+        supplier = Supplier.query.filter_by(name=form.supplier.data).first_or_404()
         t = Order(supllier_id=supplier.id)
         db.session.add(t)
         db.session.commit()
         flash('Nova transação cadastrada! Empresa={}, produtos={}'.format(
-            form.company.data, form.items.data))
+            form.supplier.data, form.items.data))
         return redirect(url_for('index'))
-    return render_template('neworder.html', title='Cadastrar', form=form)
+    return render_template('neworder.html', form=form)
 

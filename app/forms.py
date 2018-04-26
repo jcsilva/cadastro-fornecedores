@@ -48,7 +48,7 @@ class ItemField(StringField):
 class SupplierForm(FlaskForm):
     name = StringField('Nome', validators=[DataRequired()])
     address = TextAreaField('Endereço')
-    contacts = TextAreaField('Contato') 
+    contacts = TextAreaField('Contatos') 
     portfolio = ItemField('Produtos', description='Listar produtos separados por vírgula.')
     submit = SubmitField('Cadastrar')
     
