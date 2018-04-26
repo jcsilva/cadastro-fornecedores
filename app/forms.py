@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SubmitField
+from wtforms import StringField, TextAreaField, SubmitField, SelectField
 from wtforms.validators import DataRequired
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from app.models import Supplier, Item
-    
+from app.models import Item
+
 
 class OrderForm(FlaskForm):
-    supplier = QuerySelectField(get_label='name', query_factory=lambda: Supplier.query.all())
+    supplier = SelectField('Fornecedor', coerce=int)
     items = StringField('Produtos')
     submit = SubmitField('Cadastrar')
 
@@ -48,7 +47,6 @@ class ItemField(StringField):
 class SupplierForm(FlaskForm):
     name = StringField('Nome', validators=[DataRequired()])
     address = TextAreaField('Endereço')
-    contacts = TextAreaField('Contatos') 
+    contacts = TextAreaField('Contatos')
     portfolio = ItemField('Produtos', description='Listar produtos separados por vírgula.')
     submit = SubmitField('Cadastrar')
-    

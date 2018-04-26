@@ -36,10 +36,10 @@ def list_items():
     items = Item.query.order_by('name')
     item_list = []
     for item in items:
-        item_list.append(item.name)        
+        item_list.append(item.name)
     return render_template('listitems.html', data=item_list)
-    
-    
+
+
 @app.route('/newsupplier', methods=['GET', 'POST'])
 def new_supplier():
     form = SupplierForm()
@@ -99,6 +99,7 @@ def detail_supplier(suppliername):
 @app.route('/neworder', methods=['GET', 'POST'])
 def new_order():
     form = OrderForm()
+    form.supplier.choices = [(g.id, g.name) for g in Supplier.query.filter(Supplier.status == Status.ACTIVE).order_by('name')]
     if form.validate_on_submit():
         supplier = Supplier.query.filter_by(name=form.supplier.data).first_or_404()
         t = Order(supllier_id=supplier.id)
@@ -108,4 +109,3 @@ def new_order():
             form.supplier.data, form.items.data))
         return redirect(url_for('index'))
     return render_template('neworder.html', form=form)
-
