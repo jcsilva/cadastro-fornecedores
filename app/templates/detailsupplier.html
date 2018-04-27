@@ -4,11 +4,16 @@
     <h1>Fornecedor: {{ supplier.name }}</h1>
     <h2>Endereço: {{ supplier.address }}</h2>
     <h2>Contatos: {{ supplier.contacts }}</h2>
-    <h2>Portfolio: {{ supplier.portfolio }}</h2>
+    <h2>Portfolio: {% for item in supplier.portfolio %} {{ item.name }} {% endfor %}</h2>
     <hr>
     {% for t in supplier.orders %}
-    <p>
-    {{ t.timestamp }} : <b>{{ t.items }}</b>
-    </p>
+     <p>
+     <b> {{ t.timestamp }}</b>
+     {% for order_item in t.order_items %}
+     <p> {{order_item.item}} - {{order_item.quantity}} - {{order_item.unit_price}} </p>
+     {% endfor %}
+     Transportadora: {{t.freight_company}} - Valor do frete: {{t.freight_value}}
+     </p>
+     <hr>
     {% endfor %}
 {% endblock %}

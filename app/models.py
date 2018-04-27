@@ -39,7 +39,7 @@ class Order(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.id'))
     freight_company = db.Column(db.String(256))
-    freight_value = db.Column(db.Numeric(10, 2))
+    freight_value = db.Column(db.Numeric(10, 2), nullable=False)
     order_items = db.relationship('OrderItem', backref='order', lazy='dynamic')
 
     def __repr__(self):
@@ -50,8 +50,8 @@ class OrderItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.Integer, db.ForeignKey('order.id'))
     item = db.Column(db.String(64))
-    quantity = db.Column(db.Numeric(10, 3))
-    unit_price = db.Column(db.Numeric(10, 2))
+    quantity = db.Column(db.Numeric(10, 3), nullable=False)
+    unit_price = db.Column(db.Numeric(10, 2), nullable=False)
 
     def __repr__(self):
         return '<OrderItem {}, {}, {}>'.format(self.item, self.quantity,

@@ -14,12 +14,16 @@ def index():
 @app.route('/newitem', methods=['GET', 'POST'])
 def new_item():
     form = ItemForm()
-    if form.validate_on_submit():
-        item = Item(name=form.name.data)
-        db.session.add(item)
-        db.session.commit()
-        flash('Novo item cadastrado {}'.format(form.name.data))
-        return redirect(url_for('index'))
+    try:
+        if form.validate_on_submit():
+            item = Item(name=form.name.data)
+            db.session.add(item)
+            db.session.commit()
+            flash('Novo item cadastrado {}'.format(form.name.data))
+            return redirect(url_for('list_items'))
+    except Exception:
+        db.session.rollback()
+        flash('ERRO: O produto "{}" já foi incluído!'.format(form.name.data))
     return render_template('newitem.html', title='Cadastrar item', form=form)
 
 
@@ -107,12 +111,19 @@ def new_order(suppliername):
     supplier = Supplier.query.filter_by(name=suppliername).first_or_404()
     form = OrderForm()
     if form.validate_on_submit():
-        print(form.order_items.data)
+        print(form.freight_value.data)
         order = Order(supplier_id=supplier.id,
                       freight_company=form.freight_company.data,
-                      freight_value=form.freight_value.data,
-                      order_items=form.order_items.data)
+                      freight_value=form.freight_value.data,)
         db.session.add(order)
+        db.session.commit()
+        db.session.refresh(order) # get ID>: https://stackoverflow.com/questions/19388555/sqlalchemy-session-add-return-value
+        for item in form.order_items.data:
+            order_item = OrderItem(order_id=order.id,
+                                   item=item['item'],
+                                   quantity=item['quantity'],
+                                   unit_price=item['unit_price'])
+            db.session.add(order_item)
         db.session.commit()
         return redirect(url_for('detail_supplier', suppliername=supplier.name))
     for item in supplier.portfolio:

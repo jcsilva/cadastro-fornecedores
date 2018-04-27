@@ -1,8 +1,8 @@
-"""initial
+"""nullable off
 
-Revision ID: 2b3f8a613bd4
+Revision ID: d6e15de26d1b
 Revises: 
-Create Date: 2018-04-22 22:19:04.404550
+Create Date: 2018-04-27 11:27:29.822669
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '2b3f8a613bd4'
+revision = 'd6e15de26d1b'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -28,17 +28,19 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=64), nullable=True),
     sa.Column('address', sa.String(length=256), nullable=True),
+    sa.Column('status', sa.Integer(), nullable=True),
     sa.Column('contacts', sa.String(length=256), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_supplier_address'), 'supplier', ['address'], unique=True)
+    op.create_index(op.f('ix_supplier_address'), 'supplier', ['address'], unique=False)
     op.create_index(op.f('ix_supplier_name'), 'supplier', ['name'], unique=True)
+    op.create_index(op.f('ix_supplier_status'), 'supplier', ['status'], unique=False)
     op.create_table('order',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('timestamp', sa.DateTime(), nullable=True),
     sa.Column('supplier_id', sa.Integer(), nullable=True),
     sa.Column('freight_company', sa.String(length=256), nullable=True),
-    sa.Column('freight_value', sa.Numeric(precision=10, scale=2), nullable=True),
+    sa.Column('freight_value', sa.Numeric(precision=10, scale=2), nullable=False),
     sa.ForeignKeyConstraint(['supplier_id'], ['supplier.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -53,8 +55,8 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('order_id', sa.Integer(), nullable=True),
     sa.Column('item', sa.String(length=64), nullable=True),
-    sa.Column('quantity', sa.Numeric(precision=10, scale=3), nullable=True),
-    sa.Column('unit_price', sa.Numeric(precision=10, scale=2), nullable=True),
+    sa.Column('quantity', sa.Numeric(precision=10, scale=3), nullable=False),
+    sa.Column('unit_price', sa.Numeric(precision=10, scale=2), nullable=False),
     sa.ForeignKeyConstraint(['order_id'], ['order.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -67,6 +69,7 @@ def downgrade():
     op.drop_table('stock')
     op.drop_index(op.f('ix_order_timestamp'), table_name='order')
     op.drop_table('order')
+    op.drop_index(op.f('ix_supplier_status'), table_name='supplier')
     op.drop_index(op.f('ix_supplier_name'), table_name='supplier')
     op.drop_index(op.f('ix_supplier_address'), table_name='supplier')
     op.drop_table('supplier')

@@ -26,9 +26,9 @@
             </table>
         </div>
         <br>
-        <p> {{ form.freight_company.label }}: {{ form.freight_company(size=32) }} </p>
+        <p> {{ form.freight_company.label }}: {{ form.freight_company(size=64) }} </p>
         <br>
-        <p> {{ form.freight_value.label }}: {{ form.freight_value(size=32) }} </p>
+        <p> {{ form.freight_value.label }}: {{ form.freight_value(size=32, value=0) }} </p>
 
         <p><input type="submit" name="edit" value="Cadastrar"></p>
     </form>
