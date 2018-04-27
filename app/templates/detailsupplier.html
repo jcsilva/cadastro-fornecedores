@@ -21,6 +21,7 @@
                 {{ item.name }} <br>
             {% endfor %}
         </td>
+        <td> <a class="btn btn-primary" href="{{ url_for('edit_supplier', suppliername=supplier.name) }}">Editar</a> </td>
     </tr>
 </table>
 
