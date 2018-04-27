@@ -16,7 +16,11 @@
             <td>{{supplier.name}}</td>
             <td>{{supplier.address}}</td>
             <td>{{supplier.contacts}}</td>
-            <td>{{supplier.portfolio}}</td>
+            <td>
+                {% for item in supplier.portfolio|sort(attribute='name') %}
+                    {{ item.name }} <br>
+                {% endfor %}
+            </td>
             <td><a href="{{ url_for('detail_supplier', suppliername=supplier.name) }}">Visualizar Detalhes</a></td>
             <td><a href="{{ url_for('edit_supplier', suppliername=supplier.name) }}">Editar Fornecedor</a></td>
             <td><a href="{{ url_for('delete_supplier', suppliername=supplier.name) }}">Deletar Fornecedor</a></td>

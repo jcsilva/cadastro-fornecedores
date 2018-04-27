@@ -25,6 +25,12 @@ class Supplier(db.Model):
     def __repr__(self):
         return '<Supplier {}>'.format(self.name)
 
+    def is_active(self):
+        if self.status == Status.ACTIVE:
+            return True
+        else:
+            return False
+
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -44,6 +50,12 @@ class Order(db.Model):
 
     def __repr__(self):
         return '<Order {}>'.format(self.supplier_id)
+
+    def total_value(self):
+        total = self.freight_value
+        for order_item in self.order_items:
+            total += order_item.quantity * order_item.unit_price
+        return total
 
 
 class OrderItem(db.Model):

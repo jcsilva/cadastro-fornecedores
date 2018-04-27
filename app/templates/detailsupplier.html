@@ -1,19 +1,70 @@
 {% extends "base.html" %}
 
 {% block app_content %}
-    <h1>Fornecedor: {{ supplier.name }}</h1>
-    <h2>Endereço: {{ supplier.address }}</h2>
-    <h2>Contatos: {{ supplier.contacts }}</h2>
-    <h2>Portfolio: {% for item in supplier.portfolio %} {{ item.name }} {% endfor %}</h2>
-    <hr>
-    {% for t in supplier.orders %}
-     <p>
-     <b> {{ t.timestamp }}</b>
-     {% for order_item in t.order_items %}
-     <p> {{order_item.item}} - {{order_item.quantity}} - {{order_item.unit_price}} </p>
-     {% endfor %}
-     Transportadora: {{t.freight_company}} - Valor do frete: {{t.freight_value}}
-     </p>
-     <hr>
+
+<h2>Informações do fornecedor</h2>
+
+<table class="table table-hover">
+    <tr>
+        <th>Nome</th>
+        <th>Endereço</th>
+        <th>Contato</th>
+        <th>Produtos</th>
+    </tr>
+
+    <tr>
+        <td>{{supplier.name}}</td>
+        <td>{{supplier.address}}</td>
+        <td>{{supplier.contacts}}</td>
+        <td>
+            {% for item in supplier.portfolio|sort(attribute='name') %}
+                {{ item.name }} <br>
+            {% endfor %}
+        </td>
+    </tr>
+</table>
+
+<br>
+<br>
+<br>
+
+<h2>Histórico de compras</h2>
+<br>
+
+
+{% for order in supplier.orders %}
+{%if order.total_value() > 0 %}
+
+<b>Data:</b> {{ order.timestamp }}
+
+<table class="table table-hover">
+    <tr>
+        <th>Produto</th>
+        <th>Quantidade</th>
+        <th>Preço Unitário</th>
+    </tr>
+    {% for order_item in order.order_items %}
+        {% if order_item.quantity > 0 %}
+        <tr>
+            <td>{{ order_item.item }}</td>
+            <td>{{ order_item.quantity }}</td>
+            <td>{{ order_item.unit_price }}</td>
+        </tr>
+        {% endif %}
     {% endfor %}
+</table>
+
+<b>Transportadora:</b> {{ order.freight_company }} <br>
+<b>Valor do frete:</b> {{ order.freight_value }} <br>
+<b>Valor total da compra:</b> {{ "R${:,.2f}".format(order.total_value()) }}
+
+
+<br>
+<br>
+<br>
+<br>
+{% endif %}
+{% endfor %}
+
+
 {% endblock %}

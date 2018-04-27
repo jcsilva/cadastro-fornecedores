@@ -16,7 +16,9 @@
 
             <td>
                 {% for supplier in item.suppliers|sort(attribute='name') %}
-                <a href="{{ url_for('detail_supplier', suppliername=supplier.name) }}">{{ supplier.name }}</a> <br>
+                    {% if supplier.is_active() %}
+                        <a href="{{ url_for('detail_supplier', suppliername=supplier.name) }}">{{ supplier.name }}</a> <br>
+                    {% endif %}
                 {% endfor %}
             </td>
         </tr>
