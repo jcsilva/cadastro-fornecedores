@@ -30,10 +30,7 @@ def new_item():
 @app.route('/listitems')
 def list_items():
     items = Item.query.order_by('name')
-    item_list = []
-    for item in items:
-        item_list.append(item.name)
-    return render_template('listitems.html', data=item_list)
+    return render_template('listitems.html', items=items)
 
 
 @app.route('/newsupplier', methods=['GET', 'POST'])
@@ -117,7 +114,8 @@ def new_order(suppliername):
                       freight_value=form.freight_value.data,)
         db.session.add(order)
         db.session.commit()
-        db.session.refresh(order) # get ID>: https://stackoverflow.com/questions/19388555/sqlalchemy-session-add-return-value
+        # get ID>: https://stackoverflow.com/questions/19388555/sqlalchemy-session-add-return-value
+        db.session.refresh(order)
         for item in form.order_items.data:
             order_item = OrderItem(order_id=order.id,
                                    item=item['item'],

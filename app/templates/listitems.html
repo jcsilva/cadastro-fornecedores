@@ -2,12 +2,25 @@
 
 {% block app_content %}
 
-<h1> Lista de produtos cadastrados </h1>
+<h1> Produtos cadastrados </h1>
 
-    <hr>
-    {% for t in data %}
-      <p>
-        <b> {{ t }} </b>
-      </p>
+
+<table class="table table-hover">
+    <tr>
+        <th>Produto</th>
+        <th>Fornecedores</th>
+    </tr>
+    {% for item in items|sort(attribute='name') %}
+        <tr>
+            <td>{{item.name}}</td>
+
+            <td>
+                {% for supplier in item.suppliers|sort(attribute='name') %}
+                <a href="{{ url_for('detail_supplier', suppliername=supplier.name) }}">{{ supplier.name }}</a> <br>
+                {% endfor %}
+            </td>
+        </tr>
     {% endfor %}
+</table>
+
 {% endblock %}
