@@ -2,6 +2,7 @@
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SubmitField, SelectField, DecimalField
+from wtforms.fields.html5 import DateField
 from wtforms.fields import FieldList, FormField
 from wtforms.validators import DataRequired, Optional
 from app.models import Item
@@ -63,4 +64,5 @@ class OrderForm(FlaskForm):
     order_items = FieldList(FormField(OrderItemForm))
     freight_company = StringField('Nome da transportadora')
     freight_value = DecimalField('Valor do frete', validators=[Optional()])
+    timestamp = DateField('Data da compra', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Cadastrar')

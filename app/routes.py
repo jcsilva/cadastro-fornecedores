@@ -3,6 +3,7 @@ from app import db
 from flask import render_template, flash, redirect, request, url_for
 from app.forms import SupplierForm, OrderForm, ItemForm, PreOrderForm, OrderItemForm
 from app.models import Supplier, Order, Item, Status, OrderItem
+from datetime import datetime, time
 
 @app.route('/')
 @app.route('/index')
@@ -115,9 +116,15 @@ def new_order(suppliername):
                 # Se nada tiver sido comprado, ou se o valor total da compra for 0,
                 # nao registrar a compra, ou, pelo menos emitir um aviso antes de
                 # registrá-la
+                day=form.timestamp.data
+                if day:
+                    hours = time(12,00,00)
+                    timestamp = datetime.combine(day, hours)
+                print(timestamp)
                 order = Order(supplier_id=supplier.id,
                               freight_company=form.freight_company.data,
-                              freight_value=form.freight_value.data,)
+                              freight_value=form.freight_value.data,
+                              timestamp=timestamp)
                 db.session.add(order)
                 db.session.commit()
                 # get ID>: https://stackoverflow.com/questions/19388555/sqlalchemy-session-add-return-value
