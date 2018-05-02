@@ -37,26 +37,32 @@ def list_items():
 @app.route('/newsupplier', methods=['GET', 'POST'])
 def new_supplier():
     form = SupplierForm()
+    form.portfolio.choices = [(g.id, g.name) for g in Item.query.order_by('name')]
     if form.validate_on_submit():
         supplier = Supplier.query.filter_by(name=form.name.data).first()
+        item_list = []
+        choices = dict(form.portfolio.choices)
+        for item_idx in form.portfolio.data:
+            item_name = choices.get(item_idx)
+            item_list.append(Item.query.filter_by(name=item_name).first())
         # if I try to add a new supplier, but it was deleted (status==DELETED),
         # I should update its variables instead of creating a new record
         if supplier:
             # we never update name!
             supplier.contacts = form.contacts.data
             supplier.address = form.address.data
-            supplier.portfolio = form.portfolio.data
+            supplier.portfolio = item_list
             supplier.status = Status.ACTIVE
         else:
             p = Supplier(name=form.name.data,
                          address=form.address.data,
                          contacts=form.contacts.data,
-                         portfolio=form.portfolio.data,
+                         portfolio=item_list,
                          status=Status.ACTIVE)
             db.session.add(p)
         db.session.commit()
         flash('Novo fornecedor cadastrado {}, endereço={}, contato={}, produtos={}'.format(
-            form.name.data, form.address.data, form.contacts.data, form.portfolio.data))
+            form.name.data, form.address.data, form.contacts.data, item_list))
         return redirect(url_for('index'))
     return render_template('newsupplier.html', title='Cadastrar', form=form)
 
@@ -66,14 +72,22 @@ def edit_supplier(suppliername):
     supplier = Supplier.query.filter_by(name=suppliername).first_or_404()
     if request.method == 'POST':
         form = SupplierForm(obj=supplier)
+        form.portfolio.choices = [(g.id, g.name) for g in Item.query.order_by('name')]
         if form.validate_on_submit():
+            item_list = []
+            choices = dict(form.portfolio.choices)
+            for item_idx in form.portfolio.data:
+                item_name = choices.get(item_idx)
+                item_list.append(Item.query.filter_by(name=item_name).first())
             supplier.contacts = form.contacts.data
             supplier.address = form.address.data
-            supplier.portfolio = form.portfolio.data
+            supplier.portfolio = item_list
             db.session.commit()
             return redirect(url_for('detail_supplier', suppliername=supplier.name))
     else:
         form = SupplierForm(obj=supplier)
+        form.portfolio.choices = [(g.id, g.name) for g in Item.query.order_by('name')]
+        form.portfolio.data = [role.id for role in supplier.portfolio]
     return render_template('editsupplier.html', form=form)
 
 

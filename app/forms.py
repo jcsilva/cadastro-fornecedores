@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SubmitField, SelectField, DecimalField
+from wtforms import StringField, TextAreaField, SubmitField, SelectField, DecimalField, SelectMultipleField, widgets
 from wtforms.fields.html5 import DateField
 from wtforms.fields import FieldList, FormField
 from wtforms.validators import DataRequired, Optional
@@ -45,7 +45,7 @@ class SupplierForm(FlaskForm):
     name = StringField('Nome', validators=[DataRequired()])
     address = TextAreaField('Endereço')
     contacts = TextAreaField('Contatos')
-    portfolio = ItemField('Produtos', description='Listar produtos separados por vírgula.')
+    portfolio = SelectMultipleField('Produtos', coerce=int, option_widget = widgets.CheckboxInput())
     submit = SubmitField('Cadastrar')
 
 
