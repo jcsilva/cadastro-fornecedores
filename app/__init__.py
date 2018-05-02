@@ -19,7 +19,7 @@ from app import routes, models, errors
 if not app.debug:
     if not os.path.exists('logs'):
         os.mkdir('logs')
-    file_handler = RotatingFileHandler('logs/cadastro-clientes.log', 
+    file_handler = RotatingFileHandler('logs/cadastro-clientes.log',
                                        maxBytes=10240,
                                        backupCount=10)
     file_handler.setFormatter(logging.Formatter(
@@ -28,4 +28,4 @@ if not app.debug:
     app.logger.addHandler(file_handler)
 
     app.logger.setLevel(logging.INFO)
-    app.logger.info('Microblog startup')
+    app.logger.info('Cadastro de clientes iniciou')
