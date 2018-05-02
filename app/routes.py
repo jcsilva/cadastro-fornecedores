@@ -21,9 +21,9 @@ def new_item():
             db.session.commit()
             flash('Novo item cadastrado {}'.format(form.name.data))
             return redirect(url_for('list_items'))
-    except Exception:
+    except Exception as err:
         db.session.rollback()
-        flash('ERRO: O produto "{}" já foi incluído!'.format(form.name.data))
+        flash('ERRO: O produto "{}" já foi incluído! Detalhes: {}'.format(form.name.data, str(err)))
     return render_template('newitem.html', title='Cadastrar item', form=form)
 
 
