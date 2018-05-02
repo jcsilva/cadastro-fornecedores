@@ -1,14 +1,15 @@
-{% extends "base.html" %} {% block app_content %}
+{% extends "base.html" %}
+
+{% block app_content %}
+
 <h1>Cadastrar Compra</h1>
 
 <hr>
-
 <h2>Fornecedor: {{ supplier.name }} </h2>
-
 <hr>
 
 <div>
-    <form action="" method="post" name="teamform">
+    <form action="" method="post">
 
       {# http://flask.pocoo.org/snippets/3/ #}
       {{ form.hidden_tag() }}
@@ -21,7 +22,7 @@
                 </tr>
                 {% for member in form.order_items %}
                 <tr>
-                    <td>{{ member.item }}</td>
+                    <td>{{ member.item(readonly="readonly") }}</td>
                     <td>{{ member.quantity }}</td>
                     <td>{{ member.unit_price }}</td>
                 </tr>
@@ -43,14 +44,12 @@
         </div>
 
 
-        <p><input type="submit" value="Cadastrar"> <a class="btn" href="{{ url_for('index') }}">Cancelar</a></p>
-
+        <p>
+          <input type="submit" value="Cadastrar">
+          <a class="btn" href="{{ url_for('index') }}">Cancelar</a>
+        </p>
 
     </form>
 </div>
-
-{% if form.errors %}
-    {{ form.errors }}
-{% endif %}
 
 {% endblock %}

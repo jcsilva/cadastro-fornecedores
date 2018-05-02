@@ -107,27 +107,39 @@ def pre_order():
 def new_order(suppliername):
     supplier = Supplier.query.filter_by(name=suppliername).first_or_404()
     form = OrderForm()
-    if form.validate_on_submit():
-        print(form.freight_value.data)
-        order = Order(supplier_id=supplier.id,
-                      freight_company=form.freight_company.data,
-                      freight_value=form.freight_value.data,)
-        db.session.add(order)
-        db.session.commit()
-        # get ID>: https://stackoverflow.com/questions/19388555/sqlalchemy-session-add-return-value
-        db.session.refresh(order)
-        for item in form.order_items.data:
-            order_item = OrderItem(order_id=order.id,
-                                   item=item['item'],
-                                   quantity=item['quantity'],
-                                   unit_price=item['unit_price'])
-            db.session.add(order_item)
-        db.session.commit()
-        return redirect(url_for('detail_supplier', suppliername=supplier.name))
-    for item in supplier.portfolio:
-        order_item_form = OrderItemForm()
-        order_item_form.item = item.name
-        order_item_form.quantity = 0
-        order_item_form.unit_price = 0
-        form.order_items.append_entry(order_item_form)
+    try:
+        if form.is_submitted():
+            # when a post is submitted, we first check if all the fields are valid
+            if form.validate():
+                order = Order(supplier_id=supplier.id,
+                              freight_company=form.freight_company.data,
+                              freight_value=form.freight_value.data,)
+                db.session.add(order)
+                db.session.commit()
+                # get ID>: https://stackoverflow.com/questions/19388555/sqlalchemy-session-add-return-value
+                db.session.refresh(order)
+                print(order.id)
+                for item in form.order_items.data:
+                    order_item = OrderItem(order_id=order.id,
+                                           item=item['item'],
+                                           quantity=item['quantity'],
+                                           unit_price=item['unit_price'])
+                    db.session.add(order_item)
+                    db.session.commit()
+                return redirect(url_for('detail_supplier', suppliername=supplier.name))
+            else:
+                # when a field is not valid, we flash a message with the error.
+                flash("Erro! Detalhes: {}".format(str(form.errors)))
+        # when the page is loaded, a GET is executed.
+        # In this case, we only fill table fields.
+        else:
+            for item in supplier.portfolio:
+                order_item_form = OrderItemForm()
+                order_item_form.item = item.name
+                order_item_form.quantity = 0
+                order_item_form.unit_price = 0
+                form.order_items.append_entry(order_item_form)
+    except Exception as err:
+        db.session.rollback()
+        flash('ERRO: {}'.format(str(err)))
     return render_template('neworder.html', form=form, supplier=supplier)
