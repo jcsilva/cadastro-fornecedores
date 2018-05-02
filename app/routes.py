@@ -111,6 +111,10 @@ def new_order(suppliername):
         if form.is_submitted():
             # when a post is submitted, we first check if all the fields are valid
             if form.validate():
+                #TODO: conferir primeiro a tabela de produtos comprados e seus precos.
+                # Se nada tiver sido comprado, ou se o valor total da compra for 0,
+                # nao registrar a compra, ou, pelo menos emitir um aviso antes de
+                # registrá-la
                 order = Order(supplier_id=supplier.id,
                               freight_company=form.freight_company.data,
                               freight_value=form.freight_value.data,)

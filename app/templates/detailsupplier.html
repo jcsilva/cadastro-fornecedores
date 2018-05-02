@@ -36,7 +36,7 @@
 {% for order in supplier.orders %}
 {%if order.total_value() > 0 %}
 
-<b>Data:</b> {{ order.timestamp }}
+<b>Data:</b> {{ moment(order.timestamp).format('L') }}
 
 <table class="table table-hover">
     <tr>
