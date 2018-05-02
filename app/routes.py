@@ -118,7 +118,6 @@ def new_order(suppliername):
                 db.session.commit()
                 # get ID>: https://stackoverflow.com/questions/19388555/sqlalchemy-session-add-return-value
                 db.session.refresh(order)
-                print(order.id)
                 for item in form.order_items.data:
                     order_item = OrderItem(order_id=order.id,
                                            item=item['item'],
