@@ -69,9 +69,9 @@ def new_supplier():
     return render_template('supplierform.html', title="Cadastrar fornecedor", form=form)
 
 
-@app.route('/editsupplier/<suppliername>', methods=['GET', 'POST'])
-def edit_supplier(suppliername):
-    supplier = Supplier.query.filter_by(name=suppliername).first_or_404()
+@app.route('/editsupplier/<supplierid>', methods=['GET', 'POST'])
+def edit_supplier(supplierid):
+    supplier = Supplier.query.filter_by(id=supplierid).first_or_404()
     if request.method == 'POST':
         form = SupplierForm(obj=supplier)
         form.portfolio.choices = [(g.id, g.name) for g in Item.query.order_by('name')]
@@ -86,7 +86,7 @@ def edit_supplier(suppliername):
             supplier.portfolio = item_list
             db.session.commit()
             return redirect(url_for('detail_supplier',
-                                    suppliername=supplier.name))
+                                    supplierid=supplier.id))
     else:
         form = SupplierForm(obj=supplier)
         form.portfolio.choices = [(g.id, g.name) for g in Item.query.order_by('name')]
@@ -94,9 +94,9 @@ def edit_supplier(suppliername):
     return render_template('supplierform.html', title="Editar fornecedor", form=form)
 
 
-@app.route('/deletesupplier/<suppliername>', methods=['GET', 'POST'])
-def delete_supplier(suppliername):
-    supplier = Supplier.query.filter_by(name=suppliername).first_or_404()
+@app.route('/deletesupplier/<supplierid>', methods=['GET', 'POST'])
+def delete_supplier(supplierid):
+    supplier = Supplier.query.filter_by(id=supplierid).first_or_404()
     if request.method == 'POST':
         supplier.status = Status.DELETED
         db.session.commit()
@@ -104,9 +104,9 @@ def delete_supplier(suppliername):
     return render_template('deleteform.html', supplier=supplier)
 
 
-@app.route('/detailsupplier/<suppliername>')
-def detail_supplier(suppliername):
-    supplier = Supplier.query.filter_by(name=suppliername).first_or_404()
+@app.route('/detailsupplier/<supplierid>')
+def detail_supplier(supplierid):
+    supplier = Supplier.query.filter_by(id=supplierid).first_or_404()
     return render_template('detailsupplier.html', title='Detalhes',
                            supplier=supplier)
 
@@ -118,7 +118,7 @@ def pre_order():
     form.supplier.choices = [(g.id, g.name) for g in Supplier.query.filter(Supplier.status == Status.ACTIVE).order_by('name')]
     if request.method == 'POST':
         supplier = Supplier.query.filter_by(name=dict(form.supplier.choices).get(form.supplier.data)).first()
-        return redirect(url_for('new_order', suppliername=supplier.name))
+        return redirect(url_for('new_order', supplierid=supplier.id))
     return render_template('quickform.html', title='Escolher fornecedor', form=form)
 
 
@@ -160,9 +160,9 @@ def create_order(form, supplier, order=None):
     return order
 
 
-@app.route('/neworder/<suppliername>', methods=['GET', 'POST'])
-def new_order(suppliername):
-    supplier = Supplier.query.filter_by(name=suppliername).first_or_404()
+@app.route('/neworder/<supplierid>', methods=['GET', 'POST'])
+def new_order(supplierid):
+    supplier = Supplier.query.filter_by(id=supplierid).first_or_404()
     form = OrderForm()
     try:
         if form.is_submitted():
@@ -173,11 +173,11 @@ def new_order(suppliername):
                     db.session.add(order)
                     db.session.commit()
                     return redirect(url_for('detail_supplier',
-                                            suppliername=supplier.name))
+                                            supplierid=supplier.id))
                 else:
                     flash("A compra não foi registrada porque o valor total dos produtos foi R$0,00!")
                     return redirect(url_for('detail_supplier',
-                                            suppliername=supplier.name))
+                                            supplierid=supplier.id))
             else:
                 # when a field is not valid, we flash a message with the error.
                 flash("Erro! Detalhes: {}".format(str(form.errors)))
@@ -211,11 +211,11 @@ def edit_order(orderid):
                 if order:
                     db.session.commit()
                     return redirect(url_for('detail_supplier',
-                                            suppliername=supplier.name))
+                                            supplierid=supplier.id))
                 else:
                     flash("A compra não foi alterada porque o valor total dos produtos foi R$0,00!")
                     return redirect(url_for('detail_supplier',
-                                            suppliername=supplier.name))
+                                            supplierid=supplier.id))
             else:
                 # when a field is not valid, we flash a message with the error.
                 flash("Erro! Detalhes: {}".format(str(form.errors)))
