@@ -36,7 +36,10 @@
 
 <div class="row">
     <div class="col-sm-5"> <b>Data:</b> {{ moment(order.timestamp).format('L') }} </div>
-    <div class="col-sm-5"> <a class="btn btn-primary" href="{{ url_for('edit_order', orderid=order.id) }}">Editar</a> </div>
+    <div class="col-sm-5">
+      <a class="btn btn-primary" href="{{ url_for('edit_order', orderid=order.id) }}">Editar</a>
+      <a class="btn btn-danger" href="{{ url_for('delete_order', orderid=order.id) }}">Deletar</a>
+    </div>
 </div>
 
 <table class="table">

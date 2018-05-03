@@ -101,7 +101,7 @@ def delete_supplier(suppliername):
         supplier.status = Status.DELETED
         db.session.commit()
         return redirect(url_for('index'))
-    return render_template('deletesupplier.html', supplier=supplier)
+    return render_template('deleteform.html', supplier=supplier)
 
 
 @app.route('/detailsupplier/<suppliername>')
@@ -132,8 +132,9 @@ def create_order(form, supplier, order=None):
                                unity=item['unity'],
                                unit_price=item['unit_price'])
         order_items.append(order_item)
-    # don't register the order if total value is zero!
+
     if isclose(total, 0, rel_tol=1e-5):
+        # don't register the order if total value is zero!
         return None
 
     day = form.timestamp.data
@@ -154,7 +155,7 @@ def create_order(form, supplier, order=None):
                       freight_company=form.freight_company.data,
                       freight_value=form.freight_value.data,
                       obs=form.obs.data,
-                      order_items=order_items,                      
+                      order_items=order_items,
                       timestamp=timestamp)
     return order
 
@@ -232,3 +233,13 @@ def edit_order(orderid):
         flash('ERRO: {}'.format(str(err)))
     return render_template('orderform.html', title="Editar compra",
                            form=form, supplier=supplier)
+
+
+@app.route('/deleteorder/<orderid>', methods=['GET', 'POST'])
+def delete_order(orderid):
+    order = Order.query.filter_by(id=orderid).first_or_404()
+    if request.method == 'POST':
+        db.session.delete(order)
+        db.session.commit()
+        return redirect(url_for('index'))
+    return render_template('deleteform.html', order=order)

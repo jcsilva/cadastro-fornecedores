@@ -4,7 +4,11 @@
 
   <form action="" method="post">
     <fieldset>
-      <legend>Remover o fornecedor "{{ supplier.name }}" ?</legend>
+      {% if supplier %}
+        <legend>Tem certeza que deseja apagar o fornecedor {{supplier.name}}?</legend>
+      {% elif order %}
+        <legend>Tem certeza que deseja apagar esta transação?</legend>
+      {% endif %}
       <button class="btn btn-danger" type="submit">Deletar</button>
       <a class="btn" href="{{ url_for('index') }}">Cancelar</a>
     </fieldset>
