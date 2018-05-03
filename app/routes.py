@@ -3,7 +3,8 @@ from app import db
 from flask import render_template, flash, redirect, request, url_for
 from app.forms import SupplierForm, OrderForm, ItemForm, PreOrderForm, OrderItemForm
 from app.models import Supplier, Order, Item, Status, OrderItem
-from datetime import datetime, time
+from datetime import datetime
+from math import isclose
 
 
 @app.route('/')
@@ -84,7 +85,8 @@ def edit_supplier(suppliername):
             supplier.address = form.address.data
             supplier.portfolio = item_list
             db.session.commit()
-            return redirect(url_for('detail_supplier', suppliername=supplier.name))
+            return redirect(url_for('detail_supplier',
+                                    suppliername=supplier.name))
     else:
         form = SupplierForm(obj=supplier)
         form.portfolio.choices = [(g.id, g.name) for g in Item.query.order_by('name')]
@@ -125,33 +127,38 @@ def new_order(suppliername):
     form = OrderForm()
     try:
         if form.is_submitted():
-            # when a post is submitted, we first check if all the fields are valid
+            # when a post is submitted, we first check if all fields are valid
             if form.validate():
-                #TODO: conferir primeiro a tabela de produtos comprados e seus precos.
-                # Se nada tiver sido comprado, ou se o valor total da compra for 0,
-                # nao registrar a compra, ou, pelo menos emitir um aviso antes de
-                # registrá-la
-                day=form.timestamp.data
+                total = 0
+                order_items = []
+                for item in form.order_items.data:
+                    total += item['quantity'] * item['unit_price']
+                    order_item = OrderItem(item=item['item'],
+                                           quantity=item['quantity'],
+                                           unit_price=item['unit_price'])
+                    order_items.append(order_item)
+                # don't register the order if total value is zero!
+                if isclose(total, 0, rel_tol=1e-5):
+                    flash("A compra não foi registrada porque o valor total dos produtos foi R$0,00!")
+                    return redirect(url_for('detail_supplier',
+                                            suppliername=supplier.name))
+
+                day = form.timestamp.data
                 if day:
-                    hours = time(12,00,00)
+                    hours = datetime.utcnow().timetz()
                     timestamp = datetime.combine(day, hours)
-                print(timestamp)
+                else:
+                    timestamp = datetime.utcnow()
+
                 order = Order(supplier_id=supplier.id,
                               freight_company=form.freight_company.data,
                               freight_value=form.freight_value.data,
+                              order_items=order_items,
                               timestamp=timestamp)
                 db.session.add(order)
                 db.session.commit()
-                # get ID>: https://stackoverflow.com/questions/19388555/sqlalchemy-session-add-return-value
-                db.session.refresh(order)
-                for item in form.order_items.data:
-                    order_item = OrderItem(order_id=order.id,
-                                           item=item['item'],
-                                           quantity=item['quantity'],
-                                           unit_price=item['unit_price'])
-                    db.session.add(order_item)
-                    db.session.commit()
-                return redirect(url_for('detail_supplier', suppliername=supplier.name))
+                return redirect(url_for('detail_supplier',
+                                        suppliername=supplier.name))
             else:
                 # when a field is not valid, we flash a message with the error.
                 flash("Erro! Detalhes: {}".format(str(form.errors)))
