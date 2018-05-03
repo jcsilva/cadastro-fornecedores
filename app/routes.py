@@ -22,7 +22,7 @@ def new_item():
             item = Item(name=form.name.data)
             db.session.add(item)
             db.session.commit()
-            flash('Novo item cadastrado {}'.format(form.name.data))
+            flash('Novo item cadastrado: {}'.format(form.name.data))
             return redirect(url_for('list_items'))
     except Exception as err:
         db.session.rollback()
@@ -42,7 +42,7 @@ def delete_item(itemid):
     if request.method == 'POST':
         db.session.delete(item)
         db.session.commit()
-        return redirect(url_for('index'))
+        return redirect(url_for('list_items'))
     return render_template('deleteform.html', item=item)
 
 
@@ -195,6 +195,10 @@ def new_order(supplierid):
         # when the page is loaded, a GET is executed.
         # In this case, we only fill table fields.
         else:
+            if len(supplier.portfolio) == 0:
+                flash('ERRO: O fornecedor "{}"" não tem nenhum produto em seu portfolio. Antes de cadastrar uma compra, você precisa adicionar produtos ao seu portfolio.'.format(supplier.name))
+                return redirect(url_for('edit_supplier',
+                                        supplierid=supplier.id))
             for item in supplier.portfolio:
                 order_item_form = OrderItemForm()
                 order_item_form.item = item.name
