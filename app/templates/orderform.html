@@ -2,7 +2,7 @@
 
 {% block app_content %}
 
-<h1>Cadastrar Compra</h1>
+<h1> {{ title }}</h1>
 
 <hr>
 <h2>Fornecedor: {{ supplier.name }} </h2>
@@ -18,12 +18,14 @@
                 <tr>
                     <th> Nome </th>
                     <th> Quantidade </th>
+                    <th> Unidade </th>
                     <th> Preço unitário </th>
                 </tr>
                 {% for member in form.order_items %}
                 <tr>
                     <td>{{ member.item(readonly="readonly") }}</td>
                     <td>{{ member.quantity }}</td>
+                    <td>{{ member.unity }}</td>
                     <td>{{ member.unit_price }}</td>
                 </tr>
                 {% endfor %}
@@ -46,6 +48,12 @@
             {{ form.freight_value.label(class='control-label') }}
             <br>
             {{ form.freight_value(value=0, class='form-control') }}
+        </div>
+
+        <div class="form-group">
+            {{ form.obs.label(class='control-label') }}
+            <br>
+            {{ form.obs(value=0, class='form-control') }}
         </div>
 
 

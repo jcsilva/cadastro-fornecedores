@@ -107,7 +107,8 @@ def delete_supplier(suppliername):
 @app.route('/detailsupplier/<suppliername>')
 def detail_supplier(suppliername):
     supplier = Supplier.query.filter_by(name=suppliername).first_or_404()
-    return render_template('detailsupplier.html', title='Detalhes', supplier=supplier)
+    return render_template('detailsupplier.html', title='Detalhes',
+                           supplier=supplier)
 
 
 @app.route('/preorder/', methods=['GET', 'POST'])
@@ -121,6 +122,41 @@ def pre_order():
     return render_template('quickform.html', title='Escolher fornecedor', form=form)
 
 
+def create_order(form, supplier, order=None):
+    total = 0
+    order_items = []
+    for item in form.order_items.data:
+        total += item['quantity'] * item['unit_price']
+        order_item = OrderItem(item=item['item'],
+                               quantity=item['quantity'],
+                               unity=item['unity'],
+                               unit_price=item['unit_price'])
+        order_items.append(order_item)
+    # don't register the order if total value is zero!
+    if isclose(total, 0, rel_tol=1e-5):
+        return None
+
+    day = form.timestamp.data
+    if day:
+        hours = datetime.utcnow().timetz()
+        timestamp = datetime.combine(day, hours)
+    else:
+        timestamp = datetime.utcnow()
+
+    if order:
+        order.freight_company = form.freight_company.data
+        order.freight_value = form.freight_value.data
+        order.order_items = order_items
+        order.timestamp = timestamp
+    else:
+        order = Order(supplier_id=supplier.id,
+                      freight_company=form.freight_company.data,
+                      freight_value=form.freight_value.data,
+                      order_items=order_items,
+                      timestamp=timestamp)
+    return order
+
+
 @app.route('/neworder/<suppliername>', methods=['GET', 'POST'])
 def new_order(suppliername):
     supplier = Supplier.query.filter_by(name=suppliername).first_or_404()
@@ -129,36 +165,16 @@ def new_order(suppliername):
         if form.is_submitted():
             # when a post is submitted, we first check if all fields are valid
             if form.validate():
-                total = 0
-                order_items = []
-                for item in form.order_items.data:
-                    total += item['quantity'] * item['unit_price']
-                    order_item = OrderItem(item=item['item'],
-                                           quantity=item['quantity'],
-                                           unit_price=item['unit_price'])
-                    order_items.append(order_item)
-                # don't register the order if total value is zero!
-                if isclose(total, 0, rel_tol=1e-5):
+                order = create_order(form, supplier)
+                if order:
+                    db.session.add(order)
+                    db.session.commit()
+                    return redirect(url_for('detail_supplier',
+                                            suppliername=supplier.name))
+                else:
                     flash("A compra não foi registrada porque o valor total dos produtos foi R$0,00!")
                     return redirect(url_for('detail_supplier',
                                             suppliername=supplier.name))
-
-                day = form.timestamp.data
-                if day:
-                    hours = datetime.utcnow().timetz()
-                    timestamp = datetime.combine(day, hours)
-                else:
-                    timestamp = datetime.utcnow()
-
-                order = Order(supplier_id=supplier.id,
-                              freight_company=form.freight_company.data,
-                              freight_value=form.freight_value.data,
-                              order_items=order_items,
-                              timestamp=timestamp)
-                db.session.add(order)
-                db.session.commit()
-                return redirect(url_for('detail_supplier',
-                                        suppliername=supplier.name))
             else:
                 # when a field is not valid, we flash a message with the error.
                 flash("Erro! Detalhes: {}".format(str(form.errors)))
@@ -170,8 +186,47 @@ def new_order(suppliername):
                 order_item_form.item = item.name
                 order_item_form.quantity = 0
                 order_item_form.unit_price = 0
+                order_item_form.unity = ""
                 form.order_items.append_entry(order_item_form)
     except Exception as err:
         db.session.rollback()
         flash('ERRO: {}'.format(str(err)))
-    return render_template('neworder.html', form=form, supplier=supplier)
+    return render_template('orderform.html', title="Cadastrar compra",
+                           form=form, supplier=supplier)
+
+
+@app.route('/editorder/<orderid>', methods=['GET', 'POST'])
+def edit_order(orderid):
+    order = Order.query.filter_by(id=orderid).first_or_404()
+    supplier = Supplier.query.filter_by(id=order.supplier_id).first_or_404()
+    form = OrderForm(obj=order)
+    try:
+        if form.is_submitted():
+            # when a post is submitted, we first check if all fields are valid
+            if form.validate():
+                order = create_order(form, supplier, order)
+                if order:
+                    db.session.commit()
+                    return redirect(url_for('detail_supplier',
+                                            suppliername=supplier.name))
+                else:
+                    flash("A compra não foi alterada porque o valor total dos produtos foi R$0,00!")
+                    return redirect(url_for('detail_supplier',
+                                            suppliername=supplier.name))
+            else:
+                # when a field is not valid, we flash a message with the error.
+                flash("Erro! Detalhes: {}".format(str(form.errors)))
+        else:
+            for item in supplier.portfolio:
+                if not order.has_item(item):
+                    order_item_form = OrderItemForm()
+                    order_item_form.item = item.name
+                    order_item_form.quantity = 0
+                    order_item_form.unit_price = 0
+                    order_item_form.unity = ""
+                    form.order_items.append_entry(order_item_form)
+    except Exception as err:
+        db.session.rollback()
+        flash('ERRO: {}'.format(str(err)))
+    return render_template('orderform.html', title="Editar compra",
+                           form=form, supplier=supplier)

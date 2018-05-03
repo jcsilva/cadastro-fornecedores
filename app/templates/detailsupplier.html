@@ -32,16 +32,18 @@
 <h2>Histórico de compras</h2>
 <br>
 
-
 {% for order in supplier.orders|sort(attribute='timestamp', reverse = True) %}
-{%if order.total_value() > 0 %}
 
-<b>Data:</b> {{ moment(order.timestamp).format('L') }}
+<div class="row">
+    <div class="col-sm-5"> <b>Data:</b> {{ moment(order.timestamp).format('L') }} </div>
+    <div class="col-sm-5"> <a class="btn btn-primary" href="{{ url_for('edit_order', orderid=order.id) }}">Editar</a> </div>
+</div>
 
 <table class="table">
     <tr>
         <th>Produto</th>
         <th>Quantidade</th>
+        <th>Unidade</th>
         <th>Preço Unitário</th>
     </tr>
     {% for order_item in order.order_items|sort(attribute='item') %}
@@ -49,6 +51,7 @@
         <tr>
             <td>{{ order_item.item }}</td>
             <td>{{ order_item.quantity }}</td>
+            <td>{{ order_item.unity }}</td>
             <td>{{ order_item.unit_price }}</td>
         </tr>
         {% endif %}
@@ -66,7 +69,7 @@
 <hr>
 <br>
 <br>
-{% endif %}
+
 {% endfor %}
 
 

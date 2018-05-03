@@ -57,14 +57,21 @@ class Order(db.Model):
             total += order_item.quantity * order_item.unit_price
         return total
 
+    def has_item(self, item):
+        for order_item in self.order_items:
+            if order_item.item == item.name:
+                return True
+        return False
+
 
 class OrderItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.Integer, db.ForeignKey('order.id'))
     item = db.Column(db.String(64))
+    unity = db.Column(db.String(32))
     quantity = db.Column(db.Numeric(10, 3), nullable=False)
     unit_price = db.Column(db.Numeric(10, 2), nullable=False)
 
     def __repr__(self):
-        return '<OrderItem {}, {}, {}>'.format(self.item, self.quantity,
-                                               self.unit_price)
+        return '<OrderItem {}, {}, {}, {}>'.format(self.item, self.quantity,
+                                                   self.unity, self.unit_price)

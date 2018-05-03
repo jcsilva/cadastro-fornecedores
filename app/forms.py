@@ -58,6 +58,7 @@ class PreOrderForm(FlaskForm):
 class OrderItemForm(NoCsrfForm):
     item = StringField('Produto')
     quantity = DecimalField('Valor do frete', validators=[Optional()])
+    unity = StringField('Unidade')
     unit_price = DecimalField('Valor do frete', validators=[Optional()])
 
 
