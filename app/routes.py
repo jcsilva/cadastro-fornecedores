@@ -5,6 +5,7 @@ from app.forms import SupplierForm, OrderForm, ItemForm, PreOrderForm, OrderItem
 from app.models import Supplier, Order, Item, Status, OrderItem
 from datetime import datetime, time
 
+
 @app.route('/')
 @app.route('/index')
 def index():
@@ -24,8 +25,8 @@ def new_item():
             return redirect(url_for('list_items'))
     except Exception as err:
         db.session.rollback()
-        flash('ERRO: O produto "{}" já foi incluído! Detalhes: {}'.format(form.name.data, str(err)))
-    return render_template('newitem.html', title='Cadastrar item', form=form)
+        flash('ERRO: O produto "{}" já foi cadastrado! Detalhes: {}'.format(form.name.data, str(err)))
+    return render_template('quickform.html', title='Cadastrar item', form=form)
 
 
 @app.route('/listitems')
@@ -64,7 +65,7 @@ def new_supplier():
         flash('Novo fornecedor cadastrado {}, endereço={}, contato={}, produtos={}'.format(
             form.name.data, form.address.data, form.contacts.data, item_list))
         return redirect(url_for('index'))
-    return render_template('newsupplier.html', title='Cadastrar', form=form)
+    return render_template('supplierform.html', form=form)
 
 
 @app.route('/editsupplier/<suppliername>', methods=['GET', 'POST'])
@@ -87,8 +88,8 @@ def edit_supplier(suppliername):
     else:
         form = SupplierForm(obj=supplier)
         form.portfolio.choices = [(g.id, g.name) for g in Item.query.order_by('name')]
-        form.portfolio.data = [role.id for role in supplier.portfolio]
-    return render_template('editsupplier.html', form=form)
+        form.portfolio.data = [item.id for item in supplier.portfolio]
+    return render_template('supplierform.html', form=form)
 
 
 @app.route('/deletesupplier/<suppliername>', methods=['GET', 'POST'])
@@ -115,7 +116,7 @@ def pre_order():
     if request.method == 'POST':
         supplier = Supplier.query.filter_by(name=dict(form.supplier.choices).get(form.supplier.data)).first()
         return redirect(url_for('new_order', suppliername=supplier.name))
-    return render_template('choosesupplier.html', form=form)
+    return render_template('quickform.html', title='Escolher fornecedor', form=form)
 
 
 @app.route('/neworder/<suppliername>', methods=['GET', 'POST'])

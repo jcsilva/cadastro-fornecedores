@@ -32,13 +32,12 @@
         {{ form.portfolio.label }}
         <br>
 
-      {% for item in form.portfolio %}
-      <div class="mt-2 col-md-12">
-        {{ item }} {{ item.label }}
+        <div class="row">
+          {% for item in form.portfolio %}
+            <div class="col-sm-3"> {{ item }} {{ item.label }} </div>
+          {% endfor %}
+        </div>
       </div>
-
-      {% endfor %}
-    </div>
 
         <p>
           <input type="submit" value="Cadastrar">

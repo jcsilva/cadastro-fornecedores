@@ -45,7 +45,8 @@ class SupplierForm(FlaskForm):
     name = StringField('Nome', validators=[DataRequired()])
     address = TextAreaField('Endereço')
     contacts = TextAreaField('Contatos')
-    portfolio = SelectMultipleField('Produtos', coerce=int, option_widget = widgets.CheckboxInput())
+    portfolio = SelectMultipleField('Produtos', coerce=int,
+                                    option_widget=widgets.CheckboxInput())
     submit = SubmitField('Cadastrar')
 
 
