@@ -65,7 +65,7 @@ def new_supplier():
         flash('Novo fornecedor cadastrado {}, endereço={}, contato={}, produtos={}'.format(
             form.name.data, form.address.data, form.contacts.data, item_list))
         return redirect(url_for('index'))
-    return render_template('supplierform.html', form=form)
+    return render_template('supplierform.html', title="Cadastrar fornecedor", form=form)
 
 
 @app.route('/editsupplier/<suppliername>', methods=['GET', 'POST'])
@@ -89,7 +89,7 @@ def edit_supplier(suppliername):
         form = SupplierForm(obj=supplier)
         form.portfolio.choices = [(g.id, g.name) for g in Item.query.order_by('name')]
         form.portfolio.data = [item.id for item in supplier.portfolio]
-    return render_template('supplierform.html', form=form)
+    return render_template('supplierform.html', title="Editar fornecedor", form=form)
 
 
 @app.route('/deletesupplier/<suppliername>', methods=['GET', 'POST'])
