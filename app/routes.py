@@ -36,6 +36,16 @@ def list_items():
     return render_template('listitems.html', items=items)
 
 
+@app.route('/deleteitem/<itemid>', methods=['GET', 'POST'])
+def delete_item(itemid):
+    item = Item.query.filter_by(id=itemid).first_or_404()
+    if request.method == 'POST':
+        db.session.delete(item)
+        db.session.commit()
+        return redirect(url_for('index'))
+    return render_template('deleteform.html', item=item)
+
+
 @app.route('/newsupplier', methods=['GET', 'POST'])
 def new_supplier():
     form = SupplierForm()

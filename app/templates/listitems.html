@@ -21,6 +21,10 @@
                     {% endif %}
                 {% endfor %}
             </td>
+
+            <td>
+                <a class="btn btn-danger" href="{{ url_for('delete_item', itemid=item.id) }}">Deletar</a>
+            </td>
         </tr>
     {% endfor %}
 </table>
