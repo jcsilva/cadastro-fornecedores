@@ -50,7 +50,8 @@ def new_supplier():
         # if I try to add a new supplier, but it was deleted (status==DELETED),
         # I should update its variables instead of creating a new record
         if supplier:
-            # we never update name!
+            # we never update name! It avoids problems because the name
+            # must be unique in our database
             supplier.contacts = form.contacts.data
             supplier.address = form.address.data
             supplier.portfolio = item_list
@@ -91,7 +92,7 @@ def edit_supplier(supplierid):
         form = SupplierForm(obj=supplier)
         form.portfolio.choices = [(g.id, g.name) for g in Item.query.order_by('name')]
         form.portfolio.data = [item.id for item in supplier.portfolio]
-    return render_template('supplierform.html', title="Editar fornecedor", form=form)
+    return render_template('supplierform.html', title="Editar fornecedor", form=form, edit=True)
 
 
 @app.route('/deletesupplier/<supplierid>', methods=['GET', 'POST'])
