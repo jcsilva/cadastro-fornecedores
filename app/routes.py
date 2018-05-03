@@ -22,11 +22,14 @@ def new_item():
             item = Item(name=form.name.data)
             db.session.add(item)
             db.session.commit()
-            flash('Novo item cadastrado: {}'.format(form.name.data))
+            msg = 'Novo item cadastrado: {}'.format(form.name.data)
+            app.logger.info(msg)
+            flash(msg)
             return redirect(url_for('list_items'))
     except Exception as err:
         db.session.rollback()
-        flash('ERRO: O produto "{}" já foi cadastrado! Detalhes: {}'.format(form.name.data, str(err)))
+        app.logger.error('O produto "{}" já tinha sido cadastrado! Detalhes: {}'.format(form.name.data, str(err)))
+        flash('ERRO: O produto "{}" já tinha sido cadastrado!'.format(form.name.data))
     return render_template('quickform.html', title='Cadastrar item', form=form)
 
 
@@ -42,6 +45,7 @@ def delete_item(itemid):
     if request.method == 'POST':
         db.session.delete(item)
         db.session.commit()
+        app.logger.info('Item {} deletado'.format(item.name))
         return redirect(url_for('list_items'))
     return render_template('deleteform.html', item=item)
 
@@ -66,18 +70,24 @@ def new_supplier():
             supplier.address = form.address.data
             supplier.portfolio = item_list
             supplier.status = Status.ACTIVE
+            app.logger.info(('Fornecedor atualizado {}, endereço={},'
+                             'contato={}, produtos={}').format(form.name.data,
+                            form.address.data, form.contacts.data, item_list))
         else:
             p = Supplier(name=form.name.data,
                          address=form.address.data,
                          contacts=form.contacts.data,
                          portfolio=item_list,
                          status=Status.ACTIVE)
+            app.logger.info(('Novo fornecedor cadastrado {}, endereço={},'
+                             'contato={}, produtos={}').format(form.name.data,
+                            form.address.data, form.contacts.data, item_list))
             db.session.add(p)
         db.session.commit()
-        flash('Novo fornecedor cadastrado {}, endereço={}, contato={}, produtos={}'.format(
-            form.name.data, form.address.data, form.contacts.data, item_list))
+        flash('Novo fornecedor cadastrado: {}'.format(form.name.data))
         return redirect(url_for('index'))
-    return render_template('supplierform.html', title="Cadastrar fornecedor", form=form)
+    return render_template('supplierform.html', title="Cadastrar fornecedor",
+                           form=form)
 
 
 @app.route('/editsupplier/<supplierid>', methods=['GET', 'POST'])
@@ -95,6 +105,10 @@ def edit_supplier(supplierid):
             supplier.contacts = form.contacts.data
             supplier.address = form.address.data
             supplier.portfolio = item_list
+            app.logger.info(('Fornecedor {} editado. Os novos parâmetros são:'
+                             ' endereço={}, eontato={}, produtos={}').format(
+                             form.name.data, form.address.data,
+                             form.contacts.data, item_list))
             db.session.commit()
             return redirect(url_for('detail_supplier',
                                     supplierid=supplier.id))
@@ -111,6 +125,7 @@ def delete_supplier(supplierid):
     if request.method == 'POST':
         supplier.status = Status.DELETED
         db.session.commit()
+        app.logger.info('Fornecedor "{}" deletado'.format(supplier.name))
         return redirect(url_for('index'))
     return render_template('deleteform.html', supplier=supplier)
 
@@ -145,6 +160,7 @@ def create_order(form, supplier, order=None):
         order_items.append(order_item)
 
     if isclose(total, 0, rel_tol=1e-5):
+        app.logger.info('Valor total da compra: {}'.format(total))
         # don't register the order if total value is zero!
         return None
 
@@ -161,6 +177,11 @@ def create_order(form, supplier, order=None):
         order.obs = form.obs.data
         order.order_items = order_items
         order.timestamp = timestamp
+        app.logger.info(('Atualizando order "{}": companhia de frete={}, '
+                         'valor do frete={}, observações={}, items={}, '
+                         'timestamp={}, fornecedor={}').format(order.id,
+                        order.freight_company, order.freight_value, order.obs,
+                        order.order_items, order.timestamp, order.supplier_id))
     else:
         order = Order(supplier_id=supplier.id,
                       freight_company=form.freight_company.data,
@@ -168,6 +189,11 @@ def create_order(form, supplier, order=None):
                       obs=form.obs.data,
                       order_items=order_items,
                       timestamp=timestamp)
+        app.logger.info(('Nova order "{}": companhia de frete={}, '
+                         'valor do frete={}, observações={}, items={}, '
+                         'timestamp={}, fornecedor={}').format(order.id,
+                        order.freight_company, order.freight_value, order.obs,
+                        order.order_items, order.timestamp, order.supplier_id))
     return order
 
 
@@ -183,20 +209,29 @@ def new_order(supplierid):
                 if order:
                     db.session.add(order)
                     db.session.commit()
+                    app.logger.info('Order "{}" criada com sucesso'.format(
+                                    order.id))
                     return redirect(url_for('detail_supplier',
                                             supplierid=supplier.id))
                 else:
-                    flash("A compra não foi registrada porque o valor total dos produtos foi R$0,00!")
+                    flash(('A compra não foi registrada porque o valor total '
+                           'dos produtos foi R$0,00!'))
                     return redirect(url_for('detail_supplier',
                                             supplierid=supplier.id))
             else:
                 # when a field is not valid, we flash a message with the error.
+                app.logger.error(str(form.errors))
                 flash("Erro! Detalhes: {}".format(str(form.errors)))
         # when the page is loaded, a GET is executed.
         # In this case, we only fill table fields.
         else:
             if len(supplier.portfolio) == 0:
-                flash('ERRO: O fornecedor "{}"" não tem nenhum produto em seu portfolio. Antes de cadastrar uma compra, você precisa adicionar produtos ao seu portfolio.'.format(supplier.name))
+                msg = ('O fornecedor "{}"" não tem nenhum produto em seu'
+                       ' portfolio. Antes de cadastrar uma compra, você'
+                       ' precisa adicionar produtos ao seu portfolio.').format(
+                       supplier.name)
+                app.logger.info(msg)
+                flash(msg)
                 return redirect(url_for('edit_supplier',
                                         supplierid=supplier.id))
             for item in supplier.portfolio:
@@ -208,6 +243,7 @@ def new_order(supplierid):
                 form.order_items.append_entry(order_item_form)
     except Exception as err:
         db.session.rollback()
+        app.logger.error(str(err))
         flash('ERRO: {}'.format(str(err)))
     return render_template('orderform.html', title="Cadastrar compra",
                            form=form, supplier=supplier)
@@ -225,15 +261,19 @@ def edit_order(orderid):
                 order = create_order(form, supplier, order)
                 if order:
                     db.session.commit()
+                    app.logger.info('Order "{}" editada com sucesso'.format(
+                                    order.id))
                     return redirect(url_for('detail_supplier',
                                             supplierid=supplier.id))
                 else:
-                    flash("A compra não foi alterada porque o valor total dos produtos foi R$0,00!")
+                    flash(('A compra não foi alterada porque o valor total '
+                           'dos produtos foi R$0,00!'))
                     return redirect(url_for('detail_supplier',
                                             supplierid=supplier.id))
             else:
                 # when a field is not valid, we flash a message with the error.
-                flash("Erro! Detalhes: {}".format(str(form.errors)))
+                app.logger.error(str(form.errors))
+                flash('Erro! Detalhes: {}'.format(str(form.errors)))
         else:
             for item in supplier.portfolio:
                 if not order.has_item(item):
@@ -245,6 +285,7 @@ def edit_order(orderid):
                     form.order_items.append_entry(order_item_form)
     except Exception as err:
         db.session.rollback()
+        app.logger.error(str(err))
         flash('ERRO: {}'.format(str(err)))
     return render_template('orderform.html', title="Editar compra",
                            form=form, supplier=supplier)
@@ -256,5 +297,6 @@ def delete_order(orderid):
     if request.method == 'POST':
         db.session.delete(order)
         db.session.commit()
+        app.logger.info('Order "{}" deletada'.format(order))
         return redirect(url_for('index'))
     return render_template('deleteform.html', order=order)
