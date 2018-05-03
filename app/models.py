@@ -46,6 +46,7 @@ class Order(db.Model):
     supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.id'))
     freight_company = db.Column(db.String(256))
     freight_value = db.Column(db.Numeric(10, 2), nullable=False)
+    obs = db.Column(db.String(512))
     order_items = db.relationship('OrderItem', backref='order', lazy='dynamic')
 
     def __repr__(self):

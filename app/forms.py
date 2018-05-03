@@ -67,4 +67,5 @@ class OrderForm(FlaskForm):
     freight_company = StringField('Nome da transportadora')
     freight_value = DecimalField('Valor do frete', validators=[Optional()])
     timestamp = DateField('Data da compra', format='%Y-%m-%d', validators=[Optional()])
+    obs = TextAreaField('Observações')
     submit = SubmitField('Cadastrar')

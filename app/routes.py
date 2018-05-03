@@ -146,13 +146,15 @@ def create_order(form, supplier, order=None):
     if order:
         order.freight_company = form.freight_company.data
         order.freight_value = form.freight_value.data
+        order.obs = form.obs.data
         order.order_items = order_items
         order.timestamp = timestamp
     else:
         order = Order(supplier_id=supplier.id,
                       freight_company=form.freight_company.data,
                       freight_value=form.freight_value.data,
-                      order_items=order_items,
+                      obs=form.obs.data,
+                      order_items=order_items,                      
                       timestamp=timestamp)
     return order
 

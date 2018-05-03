@@ -60,7 +60,8 @@
 
 <b>Transportadora:</b> {{ order.freight_company }} <br>
 <b>Valor do frete:</b> {{ order.freight_value }} <br>
-<b>Valor total da compra:</b> {{ "R${:,.2f}".format(order.total_value()) }}
+<b>Valor total da compra:</b> {{ "R${:,.2f}".format(order.total_value()) }} <br>
+<b>Observações:</b> {{order.obs}}
 
 
 <br>
