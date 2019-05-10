@@ -55,17 +55,24 @@ class PreOrderForm(FlaskForm):
     submit = SubmitField('Escolher')
 
 
+class FlexibleDecimalField(DecimalField):
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            valuelist[0] = valuelist[0].replace(",", ".")
+        return super(FlexibleDecimalField, self).process_formdata(valuelist)
+
 class OrderItemForm(NoCsrfForm):
     item = StringField('Produto')
-    quantity = DecimalField('Valor do frete', validators=[Optional()])
+    quantity = FlexibleDecimalField('Quantidade', validators=[Optional()])
     unity = StringField('Unidade')
-    unit_price = DecimalField('Valor do frete', validators=[Optional()])
+    unit_price = FlexibleDecimalField('Preço Unitário', validators=[Optional()])
 
 
 class OrderForm(FlaskForm):
     order_items = FieldList(FormField(OrderItemForm))
     freight_company = StringField('Nome da transportadora')
-    freight_value = DecimalField('Valor do frete', validators=[Optional()])
+    freight_value = FlexibleDecimalField('Valor do frete', validators=[Optional()])
     timestamp = DateField('Data da compra', format='%Y-%m-%d', validators=[Optional()])
     obs = TextAreaField('Observações')
     submit = SubmitField('Cadastrar')
