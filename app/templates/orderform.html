@@ -8,27 +8,37 @@
 <h2>Fornecedor: {{ supplier.name }} </h2>
 <hr>
 
+<style>
+  table td input {
+    width: 100%;
+}
+</style>
+
 <div>
     <form action="" method="post">
 
       {# http://flask.pocoo.org/snippets/3/ #}
       {{ form.hidden_tag() }}
-        <div class="table">
-            <table>
+        <div class="container">
+            <table class="table">
+              <thead>
                 <tr>
-                    <th> Nome </th>
-                    <th> Quantidade </th>
-                    <th> Unidade </th>
-                    <th> Preço unitário </th>
+                    <th style="width:70%"> Nome </th>
+                    <th style="width:10%"> Quantidade </th>
+                    <th style="width:10%"> Unidade </th>
+                    <th style="width:10%"> Preço unitário </th>
                 </tr>
+              </thead>
+              <tbody>
                 {% for member in form.order_items %}
                 <tr>
-                    <td>{{ member.item(readonly="readonly") }}</td>
-                    <td>{{ member.quantity }}</td>
-                    <td>{{ member.unity }}</td>
-                    <td>{{ member.unit_price }}</td>
+                    <td> {{ member.item(readonly="readonly") }} </td>
+                    <td> {{ member.quantity }} </td>
+                    <td> {{ member.unity }} </td>
+                    <td> {{ member.unit_price }}</td>
                 </tr>
                 {% endfor %}
+              </tbody>
             </table>
         </div>
 
