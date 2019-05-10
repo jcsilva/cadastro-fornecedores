@@ -54,7 +54,8 @@ class PreOrderForm(FlaskForm):
     supplier = SelectField('Fornecedor', coerce=int)
     submit = SubmitField('Escolher')
 
-
+# https://stackoverflow.com/questions/28057252/how-to-accept-both-dot-and-comma-as-a-decimal-separator-with-wtforms
+# Classe para lidar com . e , na hora de tratar valores não inteiros
 class FlexibleDecimalField(DecimalField):
 
     def process_formdata(self, valuelist):
